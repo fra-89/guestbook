@@ -1,37 +1,35 @@
-# Please choose from the below set of Docker commands to complete your Dockerfile:
-
-# COPY
-# RUN
-# ADD
-# EXPOSE
-# FROM
-# CMD
-# PUSH
-# PULL
-# WORKDIR
-
-
-FROM golang:1.18 as builder
+# Stage 1: Build stage
+FROM golang:1.18 AS builder
 
 WORKDIR /app
 
+# Copia il file main.go
 COPY main.go .
 
+# Configura i moduli Go e costruisci l'eseguibile
 RUN go mod init guestbook
 RUN go mod tidy
 
 RUN go build -o main main.go
 
+# Stage 2: Production stage
 FROM ubuntu:18.04
 
-<Please fill in the required Docker command> --from=builder /app/main /app/guestbook
+# Copia il binario dal builder
+COPY --from=builder /app/main /app/guestbook
 
-<Please fill in the required Docker command> public/index.html /app/public/index.html
-<Please fill in the required Docker command> public/script.js /app/public/script.js
-<Please fill in the required Docker command> public/style.css /app/public/style.css
-<Please fill in the required Docker command> public/jquery.min.js /app/public/jquery.min.js
+# Aggiungi i file pubblici
+ADD public/index.html /app/public/index.html
+ADD public/script.js /app/public/script.js
+ADD public/style.css /app/public/style.css
+ADD public/jquery.min.js /app/public/jquery.min.js
 
+# Imposta la directory di lavoro
 WORKDIR /app
 
+# Esponi la porta 3000 per l'applicazione
+EXPOSE 3000
+
+# Definisci il comando di default per avviare l'app
 CMD ["./guestbook"]
-<Please fill in the required Docker command> 3000
+
